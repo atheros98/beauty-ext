@@ -3,25 +3,33 @@ import { Container, Row, Col } from 'reactstrap';
 import axios from 'axios';
 import config from '../config/config';
 import Image from './Image';
-import images from '../mockup/images.json';
+import Lightbox from 'react-image-lightbox';
+// import images from '../mockup/images.json';
 
 class MainContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            images,
+            normal: [],
+            sexy: [],
+            photoIndex: 0,
+            isOpenNormal: false,
+            isOpenSexy: false
         }
     }
     componentDidMount() {
-        // Bai tap.
-        // Sua thanh load online.
-        this.setState({
-            normal: this.state.images.normal.slice(0, 5),
-            sexy: this.state.images.sexy.slice(0, 5)
+        var that = this;
+        axios.get(config.API_URL)
+             .then(function(respone){
+                 that.setState({
+                    normal: respone.data.normal.slice(0, 5),
+                    sexy: respone.data.sexy.slice(0, 5)
         })
+             })
+             .catch(error => console.log(error));
     }
+    
     render() {
-        console.log(this.state);
         if (this.state.normal) {
             return (
                 <Container>
@@ -33,17 +41,53 @@ class MainContainer extends Component {
                     <Row>
                         {
                             this.state.normal.map((item, id) => (
-                                <Image link={item} key={id} />
+                                <Image show={()=>{
+                                    this.setState({photoIndex: id});
+                                    this.setState({isOpenNormal: true})
+                                    }} link={item} key={id} />
                             ))
                         }
                     </Row>
                     <Row>
                         {
                             this.state.sexy.map((item, id) => (
-                                <Image link={item} key={id} />
+                                <Image show={()=>{
+                                    this.setState({photoIndex: id});
+                                    this.setState({isOpenSexy: true})
+                                    }} link={item} key={id} />
                             ))
                         }
                     </Row>
+                     {this.state.isOpenNormal &&
+                    <Lightbox
+                        mainSrc={this.state.normal[this.state.photoIndex]}
+                        nextSrc={this.state.normal[(this.state.photoIndex + 1) % this.state.normal.length]}
+                        prevSrc={this.state.normal[(this.state.photoIndex + this.state.normal.length - 1) % this.state.normal.length]}
+
+                        onCloseRequest={() => this.setState({isOpenNormal: false })}
+                        onMovePrevRequest={() => this.setState({
+                            photoIndex: (this.state.photoIndex + this.state.normal.length - 1) % this.state.normal.length,
+                        })}
+                        onMoveNextRequest={() => this.setState({
+                            photoIndex: (this.state.photoIndex + 1) % this.state.normal.length,
+                        })}
+                    />
+                }
+                    {this.state.isOpenSexy &&
+                    <Lightbox
+                        mainSrc={this.state.sexy[this.state.photoIndex]}
+                        nextSrc={this.state.sexy[(this.state.photoIndex + 1) % this.state.sexy.length]}
+                        prevSrc={this.state.sexy[(this.state.photoIndex + this.state.sexy.length - 1) % this.state.sexy.length]}
+
+                        onCloseRequest={() => this.setState({ isOpenSexy: false })}
+                        onMovePrevRequest={() => this.setState({
+                            photoIndex: (this.state.photoIndex + this.state.sexy.length - 1) % this.state.sexy.length,
+                        })}
+                        onMoveNextRequest={() => this.setState({
+                            photoIndex: (this.state.photoIndex + 1) % this.state.sexy.length,
+                        })}
+                    />
+                }
                 </Container>
             )
         }
