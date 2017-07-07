@@ -1,0 +1,10 @@
+#thumb{
+    width: 195px;
+    height:250px;
+}
+
+#thumb:hover{
+    opacity: 0.5;
+    transition-duration: 0.5s;  
+}
+ 
