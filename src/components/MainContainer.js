@@ -4,8 +4,8 @@ import axios from 'axios';
 import config from '../config/config';
 import Image from './Image';
 import Lightbox from 'react-image-lightbox';
+import './styles.css';
 // import images from '../mockup/images.json';
-
 class MainContainer extends Component {
     constructor(props) {
         super(props);
@@ -32,6 +32,7 @@ class MainContainer extends Component {
     render() {
         if (this.state.normal) {
             return (
+                
                 <Container>
                     <Row>
                         <Col>
@@ -44,6 +45,7 @@ class MainContainer extends Component {
                                 <Image show={()=>{
                                     this.setState({photoIndex: id});
                                     this.setState({isOpenNormal: true})
+                                    
                                     }} link={item} key={id} />
                             ))
                         }
